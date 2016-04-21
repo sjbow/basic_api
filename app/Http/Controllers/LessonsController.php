@@ -1,13 +1,30 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Api\Transformers\LessonTransformer;
+use App\Lesson;
+use App\Tag;
 use Illuminate\Http\Request;
 
 use App\Http\Requests;
-
-class LessonsController extends Controller
+class LessonsController extends ApiController 
 {
+
+    /**
+     * @var LessonTransformer
+     */
+     protected $lessonTransformer;
+
+	/**
+	 * @author <sbow>
+	 * @added on the 01/03/2016
+	 * @param LessonTransformer $lessonTransformer
+	 */
+	public function __construct (LessonTransformer $lessonTransformer){
+		$this->lessonTransformer = $lessonTransformer;
+		$this->middleware('auth.basic', ['only' => 'store']);
+	}
+	
     /**
      * Display a listing of the resource.
      *
@@ -15,7 +32,8 @@ class LessonsController extends Controller
      */
     public function index()
     {
-        return "Hello";
+        $lessons = Lesson::all();
+		return $this->respond(['data' => $this->lessonTransformer->transformCollection($lessons->all())]);
     }
 
     /**
@@ -36,7 +54,14 @@ class LessonsController extends Controller
      */
     public function store(Request $request)
     {
-        //
+		if( ! $request->get('title') or ! $request->get('body'))
+		{
+			return $this->responseUnprocessable('Parameters failed validation for a lesson.');
+		}
+		
+		Lesson::create($request->all());
+
+		return $this->respondCreated('Lesson successfully created.');
     }
 
     /**
@@ -47,7 +72,14 @@ class LessonsController extends Controller
      */
     public function show($id)
     {
-        //
+		$lesson = Lesson::find($id);
+
+		if( ! $lesson)
+		{
+			return $this->responseNotFound("Lesson does not exist");
+		}
+
+		return $this->respond(['data' => $this->lessonTransformer->transform($lesson)]);
     }
 
     /**
