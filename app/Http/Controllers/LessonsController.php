@@ -58,7 +58,8 @@ class LessonsController extends ApiController
 		{
 			return $this->responseUnprocessable('Parameters failed validation for a lesson.');
 		}
-		
+
+//		$request['some_bool']
 		Lesson::create($request->all());
 
 		return $this->respondCreated('Lesson successfully created.');

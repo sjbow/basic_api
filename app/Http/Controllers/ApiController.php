@@ -51,7 +51,7 @@ class ApiController extends Controller
 	 */
 	public function responseNotFound($message = "Not Found"){
 
-		return $this->setStatusCode(Response::HTTP_NOT_FOUND)->respondWithError($message);
+		return $this->setStatusCode(404)->respondWithError($message);
 	}
 
 	/**
