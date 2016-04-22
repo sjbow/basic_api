@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Requests;
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
 
 
 /**
@@ -111,6 +113,27 @@ class ApiController extends Controller
 	 */
 	public function respond($data, $headers = []){
 		return response()->json($data,$this->getStatusCode(), $headers);
+	}
+
+	/**
+	 * @author <sbow>
+	 * @added on the 01/03/2016
+	 * @param LengthAwarePaginator $lessons
+	 * @return mixed
+	 */
+	protected function respondWithPagination(LengthAwarePaginator $lessons, $data)
+	{
+
+		$data = array_merge($data, [
+			'paginator' => [
+				'total_count' => $lessons->total(),
+				'total_pages' => ceil($lessons->total() / $lessons->perPage()),
+				'current_page' => $lessons->currentPage(),
+				'limit' => $lessons->perPage(),
+			]
+		]);
+
+		return $this->respond($data);
 	}
 
 	/**

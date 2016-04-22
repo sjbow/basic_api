@@ -30,11 +30,14 @@ class LessonsController extends ApiController
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(Request $request)
     {
-        $lessons = Lesson::all();
-		return $this->respond(['data' => $this->lessonTransformer->transformCollection($lessons->all())]);
-    }
+		$limit = $request->get('limit') ?: 5;
+        $lessons = Lesson::paginate($limit);
+		return $this->respondWithPagination($lessons, [
+			'data' => $this->lessonTransformer->transformCollection($lessons->all()),
+		]);
+	}
 
     /**
      * Show the form for creating a new resource.
@@ -116,4 +119,6 @@ class LessonsController extends ApiController
     {
         //
     }
+
+
 }
